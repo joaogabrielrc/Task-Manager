@@ -1,23 +1,79 @@
-const getAllTasks = (request, response) => {
-  response.status(200).json("get all tasks");
+const Task = require("../models/Task");
+
+
+const getAllTasks = async (_request, response) => {
+  try {
+    const tasks = await Task.find({});
+    response.status(200).json({ tasks });
+
+  } catch (error) {
+    response.status(500).json({ message: error });
+  }
 };
 
-const createTask = (request, response) => {
-  response.status(201).json("create a task");
+const createTask = async (request, response) => {
+  try {
+    const task = await Task.create(request.body);
+    response.status(201).json({ task });
+
+  } catch (error) {
+    response.status(500).json({ message: error });
+  }
 };
 
-const getTask = (request, response) => {
-  const id = request.params.id;
-  console.log(id, typeof id);
-  response.status(200).json("get task");
+const getTask = async (request, response) => {
+  try {
+    const { id: taskID } = request.params;
+    const task = await Task.findOne({ _id: taskID });
+
+    if (!task) return response.status(404).json({
+      message: "Task not found."
+    });
+
+    response.status(200).json({ task });
+
+  } catch (error) {
+    response.status(500).json({ message: error });
+  }
 };
 
-const updateTask = (request, response) => {
-  response.status(200).json("update a task");
+const updateTask = async (request, response) => {
+  try {
+    const { id: taskID } = request.params;
+    const task = await Task.findOneAndUpdate(
+      { _id: taskID },
+      request.body,
+      {
+        new: true,
+        runValidators: true
+      }
+    );
+
+    if (!task) return response.status(404).json({
+      message: "Task not found."
+    });
+
+    response.status(200).json({ task });
+
+  } catch (error) {
+    response.status(500).json({ message: error });
+  }
 };
 
-const deleteTask = (request, response) => {
-  response.status(204).json();
+const deleteTask = async (request, response) => {
+  try {
+    const { id: taskID } = request.params;
+    const task = await Task.findOneAndDelete({ _id: taskID });
+
+    if (!task) return response.status(404).json({
+      message: "Task not found."
+    });
+
+    response.status(204).json();
+
+  } catch (error) {
+    response.status(500).json({ message: error });
+  }
 };
 
 
