@@ -1,80 +1,57 @@
 const Task = require("../models/Task");
+const asyncWrapper = require("../middleware/async");
+const CustomAPIError = require("../errors/custom-error");
 
 
-const getAllTasks = async (_request, response) => {
-  try {
-    const tasks = await Task.find({});
-    response.status(200).json({ tasks });
+const getAllTasks = asyncWrapper(async (_request, response) => {
+  const tasks = await Task.find({});
+  response.status(200).json({ tasks });
+});
 
-  } catch (error) {
-    response.status(500).json({ message: error });
-  }
-};
+const createTask = asyncWrapper(async (request, response) => {
+  const task = await Task.create(request.body);
+  response.status(201).json({ task });
+});
 
-const createTask = async (request, response) => {
-  try {
-    const task = await Task.create(request.body);
-    response.status(201).json({ task });
+const getTask = asyncWrapper(async (request, response, next) => {
+  const { id: taskID } = request.params;
+  const task = await Task.findOne({ _id: taskID });
 
-  } catch (error) {
-    response.status(500).json({ message: error });
-  }
-};
+  if (!task) return next(
+    new CustomAPIError("Task Not Found.", 404)
+  );
 
-const getTask = async (request, response) => {
-  try {
-    const { id: taskID } = request.params;
-    const task = await Task.findOne({ _id: taskID });
+  response.status(200).json({ task });
+});
 
-    if (!task) return response.status(404).json({
-      message: "Task not found."
-    });
+const updateTask = asyncWrapper(async (request, response, next) => {
+  const { id: taskID } = request.params;
+  const task = await Task.findOneAndUpdate(
+    { _id: taskID },
+    request.body,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
-    response.status(200).json({ task });
+  if (!task) return next(
+    new CustomAPIError("Task Not Found.", 404)
+  );
 
-  } catch (error) {
-    response.status(500).json({ message: error });
-  }
-};
+  response.status(200).json({ task });
+});
 
-const updateTask = async (request, response) => {
-  try {
-    const { id: taskID } = request.params;
-    const task = await Task.findOneAndUpdate(
-      { _id: taskID },
-      request.body,
-      {
-        new: true,
-        runValidators: true
-      }
-    );
+const deleteTask = asyncWrapper(async (request, response, next) => {
+  const { id: taskID } = request.params;
+  const task = await Task.findOneAndDelete({ _id: taskID });
 
-    if (!task) return response.status(404).json({
-      message: "Task not found."
-    });
+  if (!task) return next(
+    new CustomAPIError("Task Not Found.", 404)
+  );
 
-    response.status(200).json({ task });
-
-  } catch (error) {
-    response.status(500).json({ message: error });
-  }
-};
-
-const deleteTask = async (request, response) => {
-  try {
-    const { id: taskID } = request.params;
-    const task = await Task.findOneAndDelete({ _id: taskID });
-
-    if (!task) return response.status(404).json({
-      message: "Task not found."
-    });
-
-    response.status(204).json();
-
-  } catch (error) {
-    response.status(500).json({ message: error });
-  }
-};
+  response.status(204).json();
+});
 
 
 module.exports = {
