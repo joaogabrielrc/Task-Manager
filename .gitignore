@@ -1,3 +1,6 @@
 node_modules/
-.env*
-.eslintrc.js
+.eslint*
+.env
+.env.dev*
+.env.prod*
+.vscode/
