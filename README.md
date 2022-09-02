@@ -11,11 +11,11 @@
 <div align="center">
   <img 
     src="https://user-images.githubusercontent.com/72986311/188046695-ce9546b5-e87d-41f9-bfad-a184d4bc1c7f.png" 
-    width="450px"     
+    width="350px"     
    />
    <img 
     src="https://user-images.githubusercontent.com/72986311/188046704-8e77ba8d-37e5-48e5-b732-72a929a0860f.png" 
-    width="450px"     
+    width="350px"     
    />
 </div>
 <br />
